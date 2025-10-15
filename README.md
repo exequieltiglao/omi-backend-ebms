@@ -1,16 +1,15 @@
 # OMI Backend API Automation Framework
 
-A professional, scalable REST API automation framework using Playwright + TypeScript.
+A professional REST API automation framework using Playwright + TypeScript for comprehensive backend testing.
 
-## 🚀 Features
+## 🚀 Key Features
 
-- **Professional Structure**: Well-organized, maintainable test architecture
-- **TypeScript Support**: Full type safety and IntelliSense support
-- **Comprehensive Testing**: Health checks, authentication, user management
-- **Robust Utilities**: API client, logging, test data generation
-- **Multiple Report Formats**: HTML, JSON, JUnit XML reports
-- **CI/CD Ready**: Configured for continuous integration
-- **Best Practices**: ESLint, Prettier, proper error handling
+- **TypeScript Support**: Full type safety and modern development experience
+- **Comprehensive Testing**: Health checks, authentication, user management, and API validation
+- **Professional Architecture**: Well-organized, maintainable test structure with utilities
+- **Multiple Reports**: HTML, JSON, and JUnit XML formats for different use cases
+- **CI/CD Ready**: Pre-configured for GitHub Actions and Jenkins integration
+- **Code Quality**: ESLint, Prettier, and best practices enforcement
 
 ## 📁 Project Structure
 
@@ -41,267 +40,107 @@ tests/api-automation/
     └── README.md             # Report documentation
 ```
 
-## 🛠️ Installation
+## 🛠️ Quick Start
 
-1. **Install Dependencies**
+1. **Install & Setup**
    ```bash
    cd tests/api-automation
    npm install
-   ```
-
-2. **Install Playwright Browsers**
-   ```bash
    npm run install:browsers
+   cp .env .env.local  # Configure your API endpoints
    ```
 
-3. **Configure Environment**
+2. **Run Tests**
    ```bash
-   cp .env .env.local
-   # Edit .env.local with your API endpoints and credentials
+   npm test                    # All tests
+   npm run test:auth          # Authentication tests
+   npm run test:users         # User management tests
+   npm run test:report        # View HTML report
    ```
 
-## 🧪 Running Tests
+## 🧪 Test Commands
 
-### All Tests
-```bash
-npm test
-```
-
-### Specific Test Suites
-```bash
-# Health check tests
-npm run test:healthcheck
-
-# Authentication tests
-npm run test:auth
-
-# User management tests
-npm run test:users
-```
-
-### Test Modes
-```bash
-# Headed mode (with browser UI)
-npm run test:headed
-
-# Debug mode
-npm run test:debug
-
-# UI mode (interactive)
-npm run test:ui
-```
-
-### View Reports
-```bash
-npm run test:report
-```
+| Command | Description |
+|---------|-------------|
+| `npm test` | Run all tests |
+| `npm run test:auth` | Authentication tests |
+| `npm run test:users` | User management tests |
+| `npm run test:healthcheck` | Health check tests |
+| `npm run test:headed` | Run with browser UI |
+| `npm run test:debug` | Debug mode |
+| `npm run test:ui` | Interactive UI mode |
+| `npm run test:report` | View HTML report |
 
 ## 🔧 Development
 
 ### Code Quality
 ```bash
-# Lint code
-npm run lint
-
-# Fix linting issues
-npm run lint:fix
-
-# Format code
-npm run format
-
-# Check formatting
-npm run format:check
+npm run lint          # Lint code
+npm run lint:fix      # Fix linting issues  
+npm run format        # Format code
+npm run format:check  # Check formatting
 ```
 
 ### Adding New Tests
 
-1. **Create Test File**
-   ```typescript
-   // tests/feature/newFeature.spec.ts
-   import { test, expect } from '@playwright/test';
-   import { ApiClient } from '../../utils/apiClient';
-   
-   test.describe('New Feature Tests', () => {
-     let apiClient: ApiClient;
-   
-     test.beforeEach(async ({ request }) => {
-       apiClient = new ApiClient(request, env.API_BASE_URL);
-     });
-   
-     test('should test new feature', async () => {
-       // Test implementation
-     });
-   });
-   ```
+Create a new test file in the appropriate directory:
+```typescript
+// tests/feature/newFeature.spec.ts
+import { test, expect } from '@playwright/test';
+import { ApiClient } from '../../utils/apiClient';
 
-2. **Add Test Data**
-   ```typescript
-   // utils/testData.ts
-   export class TestDataGenerator {
-     static generateNewFeatureData(): NewFeatureData {
-       return {
-         // Generated test data
-       };
-     }
-   }
-   ```
+test.describe('New Feature Tests', () => {
+  let apiClient: ApiClient;
 
-3. **Update Package Scripts**
-   ```json
-   // package.json
-   {
-     "scripts": {
-       "test:new-feature": "playwright test tests/feature/"
-     }
-   }
-   ```
+  test.beforeEach(async ({ request }) => {
+    apiClient = new ApiClient(request, env.API_BASE_URL);
+  });
 
-## 📊 Test Coverage
+  test('should test new feature', async () => {
+    // Test implementation
+  });
+});
+```
 
-The framework includes comprehensive test coverage for:
+## 📊 Test Coverage & Features
 
-- **Health Checks**: API availability and response times
-- **Authentication**: Login, registration, token management
-- **User Management**: CRUD operations, validation, authorization
-- **Error Handling**: Invalid requests, edge cases
-- **Data Validation**: Input sanitization, format validation
-- **Security**: Authentication, authorization, data protection
+**Comprehensive Testing**: Health checks, authentication, user management, error handling, data validation, and security testing.
 
-## 🔒 Security Features
+**Security Features**: Data sanitization, secure token management, input validation, and secure error handling.
 
-- **Data Sanitization**: Automatic removal of sensitive data from logs
-- **Token Management**: Secure token handling and validation
-- **Input Validation**: Comprehensive input validation and sanitization
-- **Error Handling**: Secure error responses without sensitive information
-
-## 📈 Reporting
-
-### HTML Report
-- Interactive test results
-- Detailed test execution timeline
-- Screenshots and videos for failed tests
-- Test performance metrics
-
-### JSON Report
-- Machine-readable test results
-- Integration with external tools
-- Detailed test metadata
-
-### JUnit XML
-- CI/CD integration
-- Standard test result format
-- Compatible with most CI systems
+**Multiple Report Formats**:
+- **HTML**: Interactive results with screenshots and videos
+- **JSON**: Machine-readable for external tools  
+- **JUnit XML**: CI/CD integration standard
 
 ## 🚀 CI/CD Integration
 
-### GitHub Actions
-```yaml
-- name: Run API Tests
-  run: |
-    cd tests/api-automation
-    npm install
-    npm test
-
-- name: Upload Test Results
-  uses: actions/upload-artifact@v3
-  with:
-    name: test-results
-    path: tests/api-automation/reports/
-```
-
-### Jenkins
-```groovy
-pipeline {
-  agent any
-  stages {
-    stage('Test') {
-      steps {
-        sh 'cd tests/api-automation && npm install && npm test'
-      }
-    }
-  }
-  post {
-    always {
-      publishTestResults testResultsPattern: 'tests/api-automation/reports/results.xml'
-      publishHTML([
-        allowMissing: false,
-        alwaysLinkToLastBuild: true,
-        keepAll: true,
-        reportDir: 'tests/api-automation/reports/html-report',
-        reportFiles: 'index.html',
-        reportName: 'API Test Report'
-      ])
-    }
-  }
-}
-```
+Ready for GitHub Actions and Jenkins with pre-configured workflows and test result publishing.
 
 ## 🐛 Troubleshooting
 
-### Common Issues
-
-1. **Environment Variables Not Loaded**
-   ```bash
-   # Ensure .env file exists and is properly formatted
-   cp .env .env.local
-   ```
-
-2. **API Connection Issues**
-   ```bash
-   # Check API endpoint configuration
-   curl http://localhost:3000/health
-   ```
-
-3. **Test Timeout Issues**
-   ```bash
-   # Increase timeout in playwright.config.ts
-   timeout: 60000
-   ```
-
-4. **Authentication Failures**
-   ```bash
-   # Verify credentials in .env file
-   echo $TEST_USER_EMAIL
-   echo $TEST_USER_PASSWORD
-   ```
+**Common Issues**:
+- Environment variables: Ensure `.env.local` exists with proper API endpoints
+- Connection issues: Verify API endpoint with `curl http://localhost:3000/health`
+- Timeouts: Increase timeout in `playwright.config.ts`
+- Auth failures: Check credentials in `.env` file
 
 ## 📚 Best Practices
 
-1. **Test Organization**
-   - Group related tests in describe blocks
-   - Use descriptive test names
-   - Follow AAA pattern (Arrange, Act, Assert)
-
-2. **Data Management**
-   - Use test data generators for realistic data
-   - Clean up test data after tests
-   - Use unique identifiers to avoid conflicts
-
-3. **Error Handling**
-   - Test both success and failure scenarios
-   - Verify error messages and status codes
-   - Handle edge cases and boundary conditions
-
-4. **Maintenance**
-   - Keep tests independent and isolated
-   - Use proper setup and teardown
-   - Regular code reviews and refactoring
+- **Organization**: Group tests in describe blocks, use descriptive names, follow AAA pattern
+- **Data Management**: Use test data generators, clean up after tests, use unique identifiers  
+- **Error Handling**: Test success/failure scenarios, verify error messages and status codes
+- **Maintenance**: Keep tests independent, use proper setup/teardown, regular reviews
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Write tests for new functionality
-4. Ensure all tests pass
-5. Submit a pull request
+1. Fork → Create feature branch → Write tests → Submit PR
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+MIT License
 
 ## 🆘 Support
 
-For questions and support:
 - Create an issue in the repository
-- Check the documentation
-- Review existing test examples
+- Check documentation and existing examples
