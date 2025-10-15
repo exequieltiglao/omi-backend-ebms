@@ -23,11 +23,11 @@ export interface ApiResponse<T = any> {
  * Provides a clean interface for making HTTP requests with proper error handling
  */
 export class ApiClient {
-  private request: APIRequestContext;
+  private requestContext: APIRequestContext;
   private baseUrl: string;
 
   constructor(request: APIRequestContext, baseUrl?: string) {
-    this.request = request;
+    this.requestContext = request;
     this.baseUrl = baseUrl || env.BASE_URL;
   }
 
@@ -38,67 +38,13 @@ export class ApiClient {
     endpoint: string,
     options: Partial<ApiRequestOptions> = {}
   ): Promise<ApiResponse<T>> {
-    return this.request('GET', endpoint, options);
-  }
-
-  /**
-   * Make a POST request
-   */
-  async post<T = any>(
-    endpoint: string,
-    data?: any,
-    options: Partial<ApiRequestOptions> = {}
-  ): Promise<ApiResponse<T>> {
-    return this.request('POST', endpoint, { ...options, data });
-  }
-
-  /**
-   * Make a PUT request
-   */
-  async put<T = any>(
-    endpoint: string,
-    data?: any,
-    options: Partial<ApiRequestOptions> = {}
-  ): Promise<ApiResponse<T>> {
-    return this.request('PUT', endpoint, { ...options, data });
-  }
-
-  /**
-   * Make a DELETE request
-   */
-  async delete<T = any>(
-    endpoint: string,
-    options: Partial<ApiRequestOptions> = {}
-  ): Promise<ApiResponse<T>> {
-    return this.request('DELETE', endpoint, options);
-  }
-
-  /**
-   * Make a PATCH request
-   */
-  async patch<T = any>(
-    endpoint: string,
-    data?: any,
-    options: Partial<ApiRequestOptions> = {}
-  ): Promise<ApiResponse<T>> {
-    return this.request('PATCH', endpoint, { ...options, data });
-  }
-
-  /**
-   * Generic request method
-   */
-  private async request<T = any>(
-    method: ApiRequestOptions['method'],
-    endpoint: string,
-    options: Partial<ApiRequestOptions> = {}
-  ): Promise<ApiResponse<T>> {
     const url = this.buildUrl(endpoint);
-    const requestOptions = this.buildRequestOptions(method, options);
+    const requestOptions = this.buildRequestOptions('GET', options);
 
-    logger.info(`Making ${method} request to: ${url}`);
+    logger.info(`Making GET request to: ${url}`);
 
     try {
-      const response: APIResponse = await this.request.request(url, requestOptions);
+      const response: APIResponse = await this.requestContext.get(url, requestOptions);
       
       const responseData: ApiResponse<T> = {
         status: response.status(),
@@ -111,7 +57,134 @@ export class ApiClient {
       
       return responseData;
     } catch (error) {
-      logger.error(`Request failed: ${method} ${url}`, error);
+      logger.error(`Request failed: GET ${url}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Make a POST request
+   */
+  async post<T = any>(
+    endpoint: string,
+    data?: any,
+    options: Partial<ApiRequestOptions> = {}
+  ): Promise<ApiResponse<T>> {
+    const url = this.buildUrl(endpoint);
+    const requestOptions = this.buildRequestOptions('POST', { ...options, data });
+
+    logger.info(`Making POST request to: ${url}`);
+
+    try {
+      const response: APIResponse = await this.requestContext.post(url, requestOptions);
+      
+      const responseData: ApiResponse<T> = {
+        status: response.status(),
+        data: await response.json().catch(() => null),
+        headers: response.headers(),
+        url: response.url(),
+      };
+
+      logger.info(`Response received: ${responseData.status} - ${url}`);
+      
+      return responseData;
+    } catch (error) {
+      logger.error(`Request failed: POST ${url}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Make a PUT request
+   */
+  async put<T = any>(
+    endpoint: string,
+    data?: any,
+    options: Partial<ApiRequestOptions> = {}
+  ): Promise<ApiResponse<T>> {
+    const url = this.buildUrl(endpoint);
+    const requestOptions = this.buildRequestOptions('PUT', { ...options, data });
+
+    logger.info(`Making PUT request to: ${url}`);
+
+    try {
+      const response: APIResponse = await this.requestContext.put(url, requestOptions);
+      
+      const responseData: ApiResponse<T> = {
+        status: response.status(),
+        data: await response.json().catch(() => null),
+        headers: response.headers(),
+        url: response.url(),
+      };
+
+      logger.info(`Response received: ${responseData.status} - ${url}`);
+      
+      return responseData;
+    } catch (error) {
+      logger.error(`Request failed: PUT ${url}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Make a DELETE request
+   */
+  async delete<T = any>(
+    endpoint: string,
+    options: Partial<ApiRequestOptions> = {}
+  ): Promise<ApiResponse<T>> {
+    const url = this.buildUrl(endpoint);
+    const requestOptions = this.buildRequestOptions('DELETE', options);
+
+    logger.info(`Making DELETE request to: ${url}`);
+
+    try {
+      const response: APIResponse = await this.requestContext.delete(url, requestOptions);
+      
+      const responseData: ApiResponse<T> = {
+        status: response.status(),
+        data: await response.json().catch(() => null),
+        headers: response.headers(),
+        url: response.url(),
+      };
+
+      logger.info(`Response received: ${responseData.status} - ${url}`);
+      
+      return responseData;
+    } catch (error) {
+      logger.error(`Request failed: DELETE ${url}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Make a PATCH request
+   */
+  async patch<T = any>(
+    endpoint: string,
+    data?: any,
+    options: Partial<ApiRequestOptions> = {}
+  ): Promise<ApiResponse<T>> {
+    const url = this.buildUrl(endpoint);
+    const requestOptions = this.buildRequestOptions('PATCH', { ...options, data });
+
+    logger.info(`Making PATCH request to: ${url}`);
+
+    try {
+      const response: APIResponse = await this.requestContext.patch(url, requestOptions);
+      
+      const responseData: ApiResponse<T> = {
+        status: response.status(),
+        data: await response.json().catch(() => null),
+        headers: response.headers(),
+        url: response.url(),
+      };
+
+      logger.info(`Response received: ${responseData.status} - ${url}`);
+      
+      return responseData;
+    } catch (error) {
+      logger.error(`Request failed: PATCH ${url}`, error);
       throw error;
     }
   }
@@ -166,7 +239,7 @@ export class ApiClient {
    * Set authentication token
    */
   setAuthToken(token: string): void {
-    this.request.setExtraHTTPHeaders({
+    this.requestContext.setExtraHTTPHeaders({
       Authorization: `Bearer ${token}`,
     });
   }
@@ -175,13 +248,13 @@ export class ApiClient {
    * Clear authentication token
    */
   clearAuthToken(): void {
-    this.request.setExtraHTTPHeaders({});
+    this.requestContext.setExtraHTTPHeaders({});
   }
 
   /**
    * Set custom headers
    */
   setHeaders(headers: Record<string, string>): void {
-    this.request.setExtraHTTPHeaders(headers);
+    this.requestContext.setExtraHTTPHeaders(headers);
   }
 }
